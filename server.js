@@ -153,8 +153,8 @@ app.get('/', (req, res) => {
                 document.getElementById('resPlatform').textContent = data.platform.toUpperCase();
 
                 const optionsList = document.getElementById('downloadOptionsList');
-                optionsList.innerHTML = \`
-                    <a href="\${data.downloadUrl}" target="_blank" class="glass-card p-4 rounded-2xl flex items-center justify-between hover:border-indigo-500/50 transition-all group">
+                optionsList.innerHTML = `
+                    <a href="${data.downloadUrl}" target="_blank" class="glass-card p-4 rounded-2xl flex items-center justify-between hover:border-indigo-500/50 transition-all group">
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center group-hover:bg-indigo-600 group-hover:text-white transition-all">
                                 <i class="fa-solid fa-download"></i>
@@ -165,7 +165,7 @@ app.get('/', (req, res) => {
                             </div>
                         </div>
                         <i class="fa-solid fa-arrow-up-right-from-square text-slate-500 group-hover:text-indigo-400"></i>
-                    \`;
+                    </a>`;
 
                 resultContainer.classList.remove('hidden');
 
@@ -217,5 +217,5 @@ app.post('/api/download', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(\`🚀 OmniDownloader Pro running live at: http://localhost:\${PORT}\`);
+    console.log(`🚀 OmniDownloader Pro running live at: http://localhost:${PORT}`);
 });
