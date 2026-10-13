@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require('path');
-const fetch = require('node-fetch');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -54,7 +53,6 @@ app.post('/api/download', async (req, res) => {
     }
 });
 
-// New Proxy Route to stream actual media binary data without CORS issues
 app.get('/api/proxy-download', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('URL required');
@@ -62,7 +60,14 @@ app.get('/api/proxy-download', async (req, res) => {
     try {
         const streamResponse = await fetch(targetUrl);
         res.setHeader('Content-Type', streamResponse.headers.get('content-type') || 'application/octet-stream');
-        streamResponse.body.pipe(res);
+        
+        const reader = streamResponse.body.getReader();
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            res.write(value);
+        }
+        res.end();
     } catch (err) {
         res.status(500).send('Failed to stream file.');
     }
