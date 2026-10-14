@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const { Readable } = require('stream');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -53,21 +54,19 @@ app.post('/api/download', async (req, res) => {
     }
 });
 
+// Robust Native Stream Proxy using Node.js Readable.fromWeb
 app.get('/api/proxy-download', async (req, res) => {
     const targetUrl = req.query.url;
     if (!targetUrl) return res.status(400).send('URL required');
 
     try {
         const streamResponse = await fetch(targetUrl);
+        if (!streamResponse.ok) throw new Error('Stream fetch failed');
+
         res.setHeader('Content-Type', streamResponse.headers.get('content-type') || 'application/octet-stream');
         
-        const reader = streamResponse.body.getReader();
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            res.write(value);
-        }
-        res.end();
+        const nodeStream = Readable.fromWeb(streamResponse.body);
+        nodeStream.pipe(res);
     } catch (err) {
         res.status(500).send('Failed to stream file.');
     }
